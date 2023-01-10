@@ -91,16 +91,15 @@ func (i *IE) ValidateApplyAction() error {
 
 // HasDROP reports whether an IE has DROP bit.
 func (i *IE) HasDROP() bool {
-	if len(i.Payload) < 1 {
-		return false
+	v, err := i.ApplyAction()
+	if err == nil {
+		return has1stBit(v[0])
 	}
-
-	switch i.Type {
-	case ApplyAction, DataStatus:
-		return has1stBit(i.Payload[0])
-	default:
-		return false
+	p, err := i.DataStatus()
+	if err == nil {
+		return has1stBit(p)
 	}
+	return false
 }
 
 // HasFORW reports whether an IE has FORW bit.
@@ -114,18 +113,15 @@ func (i *IE) HasFORW() bool {
 
 // HasBUFF reports whether an IE has BUFF bit.
 func (i *IE) HasBUFF() bool {
-	if len(i.Payload) < 1 {
-		return false
+	v, err := i.ApplyAction()
+	if err == nil {
+		return has3rdBit(v[0])
 	}
-
-	switch i.Type {
-	case ApplyAction:
-		return has3rdBit(i.Payload[0])
-	case DataStatus:
-		return has2ndBit(i.Payload[0])
-	default:
-		return false
+	p, err := i.DataStatus()
+	if err == nil {
+		return has2ndBit(p)
 	}
+	return false
 }
 
 // HasNOCP reports whether an IE has NOCP bit.
